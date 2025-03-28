@@ -1,21 +1,69 @@
-const boxes = document.querySelectorAll('.box')
-window.addEventListener('scroll', checkBoxes)
+const tagsEl = document.getElementById('tags')
+const textarea = document.getElementById('textarea')
 
-// checkBoxes() // Remove it if you don't want any content first
+textarea.focus()
 
-function checkBoxes() {
-	const triggerBottom = window.innerHeight / 5 * 4
-	boxes.forEach(box =>{
-		const boxTop = box.getBoundingClientRect().top
+textarea.addEventListener('keyup', (e) => {
+    createTags(e.target.value)
 
+    if(e.key === 'Enter') {
+        setTimeout(() => {
+            e.target.value = ''
+        }, 10)
 
-		if (boxTop < triggerBottom)
-		{
-			box.classList.add('show')
-		}
-		else
-		{
-			box.classList.remove('show')
-		}
-	})
+        randomSelect()
+    }
+})
+
+function createTags(input) {
+    const tags = input.split(',').filter(tag => tag.trim() !== '').map(tag => tag.trim())
+    
+    tagsEl.innerHTML = ''
+
+    tags.forEach(tag => {
+        const tagEl = document.createElement('span')
+        tagEl.classList.add('tag')
+        tagEl.innerText = tag
+        tagsEl.appendChild(tagEl)
+    })
+}
+
+function randomSelect() {
+    const times = 30
+
+    const interval = setInterval(() => {
+        const randomTag = pickRandomTag()
+	
+	if (randomTag !== undefined) {
+        highlightTag(randomTag)
+
+        setTimeout(() => {
+            unHighlightTag(randomTag)
+        }, 100)
+	}
+    }, 100);
+
+    setTimeout(() => {
+        clearInterval(interval)
+
+        setTimeout(() => {
+            const randomTag = pickRandomTag()
+
+            highlightTag(randomTag)
+        }, 100)
+
+    }, times * 100)
+}
+
+function pickRandomTag() {
+    const tags = document.querySelectorAll('.tag')
+    return tags[Math.floor(Math.random() * tags.length)]
+}
+
+function highlightTag(tag) {
+    tag.classList.add('highlight')
+}
+
+function unHighlightTag(tag) {
+    tag.classList.remove('highlight')
 }
